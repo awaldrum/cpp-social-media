@@ -1,3 +1,0 @@
-C:/ELEC 278 Labs/ELEC 278 Assignment 1/assignment_starter_files/ASSIGNMENT 2024/cmake-build-debug/CMakeFiles/assignment.dir
-C:/ELEC 278 Labs/ELEC 278 Assignment 1/assignment_starter_files/ASSIGNMENT 2024/cmake-build-debug/CMakeFiles/edit_cache.dir
-C:/ELEC 278 Labs/ELEC 278 Assignment 1/assignment_starter_files/ASSIGNMENT 2024/cmake-build-debug/CMakeFiles/rebuild_cache.dir
