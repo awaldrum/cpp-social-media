@@ -3,8 +3,6 @@ project(C__)
 
 set(CMAKE_CXX_STANDARD 17)
 
-INCLUDE_DIRECTORIES(${FULL_PATH_TO_MYSQL_CONNECTOR_CPP_DIR}/include)
-
 add_executable(C__
         main.cpp
         functions.h
