@@ -1,0 +1,29 @@
+# VS Code settings
+.vscode/
+
+# CMake build directories
+**/cmake-build-debug/
+**/cmake-build-release/
+
+# CLion settings
+.idea/
+
+# Executables
+*.exe
+
+# Build directories
+build/
+out/
+
+# Object files
+*.o
+
+# Debug files
+*.dSYM/
+
+# Visual Studio files
+*.suo
+*.user
+*.sln
+*.vcxproj
+*.vcxproj.filters
