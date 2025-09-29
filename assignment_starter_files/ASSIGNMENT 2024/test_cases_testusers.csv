@@ -1,7 +1,0 @@
-create_user,Andrew,andrew@example.com,
-create_user,Gavin,gavin@example.com,
-create_user,Amara,amara@example.com,
-create_user,Yahya,yehya@example.com,
-create_user,Tate,tate@example.com,
-delete_user,Tate,,
-test_users,,,
