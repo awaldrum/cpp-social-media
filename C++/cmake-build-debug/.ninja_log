@@ -1,6 +1,0 @@
-# ninja log v6
-110	661	7632742723235109	CMakeFiles/C__.dir/HashTable.cpp.obj	78727370b889bd6b
-87	655	7632742723003494	CMakeFiles/C__.dir/main.cpp.obj	e270e2719d85bfd8
-100	710	7632742723133885	CMakeFiles/C__.dir/User.cpp.obj	69482337b58af7e
-711	906	7632742729245332	C__.exe	b97adfe804f27bdb
-4	1059	7646559737099765	build.ninja	fbf1cbba4e196467
