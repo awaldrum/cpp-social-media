@@ -11,4 +11,10 @@ add_executable(C__
         User.cpp
         User.h
         HashTable.cpp
-        HashTable.h)
+        HashTable.h
+        Post.cpp
+        Post.h
+        Message.cpp
+        Message.h
+        Chat.cpp
+        Chat.h)

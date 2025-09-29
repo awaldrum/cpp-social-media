@@ -3,11 +3,31 @@
 #include <string>
 #include <cstdlib>
 #include <string.h>
+#include <vector>
+#include <algorithm>
 #include "functions.h"
 
 int globalUserCount = 0;
 
 User* User::usersTable[MAX_USERS] = {NULL};
+
+User* User::search_user_by_name(const std::string& searchName) {
+    for (int i = 0; i < MAX_USERS; i++) {
+        if (usersTable[i] != NULL && usersTable[i]->getName() == searchName) {
+            return usersTable[i];
+        }
+    }
+    return NULL;
+}
+
+User* User::search_user_by_email(const std::string& searchEmail) {
+    for (int i = 0; i < MAX_USERS; i++) {
+        if (usersTable[i] != NULL && usersTable[i]->getEmail() == searchEmail) {
+            return usersTable[i];
+        }
+    }
+    return NULL;
+}
 
 void User::makeFriends(User* user1, User* user2) {
     user1->addFriend(user2);
@@ -32,6 +52,12 @@ User::User(const std::string& newName, const std::string& newEmail){
 void User::init(){
     this->userID = rand() % MAX_ID;
     this->Fcount = 0;
+    this->friends = nullptr;
+    this->userChats = nullptr;
+    this->chatCount = 0;
+    this->postsHead = nullptr;
+    this->postsTail = nullptr;
+    this->postCount = 0;
 }
 
 void User::setName(const std::string& newName){
@@ -48,6 +74,24 @@ std::string User::getName(){
 
 std::string User::getEmail(){
     return this->email;
+}
+
+void User::change_user_name(const std::string& new_name) {
+    if (new_name.length() > MAX_NAME) {
+        std::cout << "Error: Name is too long (max " << MAX_NAME << " characters)\n";
+        return;
+    }
+    this->setName(new_name);
+    std::cout << "Username changed to: " << this->getName() << std::endl;
+}
+
+void User::change_user_email(const std::string& new_email) {
+    if (new_email.length() > MAX_EMAIL) {
+        std::cout << "Error: Email is too long (max " << MAX_EMAIL << " characters)\n";
+        return;
+    }
+    this->setEmail(new_email);
+    std::cout << "Email changed to: " << this->getEmail() << std::endl;
 }
 
 int User::getUserID() const {
@@ -115,7 +159,7 @@ void User::printFriends(){
             userCount++;
         }
     }
-    User *tempFriends[userCount];
+    std::vector<User*> tempFriends(userCount);
     int index = 0;
 
     //Copy all valid entries into the array
@@ -247,7 +291,7 @@ void User::print_user_list(User** users){
         }
     }
 
-    User *tempFriends[userCount];
+    std::vector<User*> tempFriends(userCount);
     int index = 0;
 
     //Copy all valid entries into the array
@@ -331,4 +375,124 @@ User** User::getFriends() {
     friendsCopy[i] = NULL;
 
     return friendsCopy;
+}
+
+bool User::isFriendsWith(User* otherUser) const {
+    for (int i = 0; i < Fcount; i++) {
+        if (friends[i] == otherUser) {
+            return true;
+        }
+    }
+    return false;
+}
+
+Chat* User::createChat(User* otherUser) {
+    if (!isFriendsWith(otherUser)) {
+        std::cout << "Cannot create chat: " << name << " and " 
+                  << otherUser->getName() << " are not friends." << std::endl;
+        return nullptr;
+    }
+    
+    // Check if chat already exists
+    for (int i = 0; i < chatCount; i++) {
+        if (userChats[i]->involvesUser(otherUser)) {
+            return userChats[i];
+        }
+    }
+    
+    // Create new chat
+    Chat* newChat = new Chat(this, otherUser);
+    
+    // Add to both users' chat lists
+    if (chatCount == 0) {
+        userChats = new Chat*[1];
+    } else {
+        Chat** newChats = new Chat*[chatCount + 1];
+        for (int i = 0; i < chatCount; i++) {
+            newChats[i] = userChats[i];
+        }
+        delete[] userChats;
+        userChats = newChats;
+    }
+    
+    userChats[chatCount++] = newChat;
+    return newChat;
+}
+
+void User::sendMessage(User* receiver, const std::string& content) {
+    if (!isFriendsWith(receiver)) {
+        std::cout << "Cannot send message: Users are not friends." << std::endl;
+        return;
+    }
+    
+    // Get or create chat
+    Chat* chat = createChat(receiver);
+    if (!chat) {
+        return;
+    }
+    
+    // Create and add message
+    Message* msg = new Message(this, receiver, content);
+    chat->addMessage(msg);
+}
+
+void User::displayChat(User* otherUser) {
+    for (int i = 0; i < chatCount; i++) {
+        if (userChats[i]->involvesUser(otherUser)) {
+            userChats[i]->displayChat();
+            return;
+        }
+    }
+    std::cout << "No chat found between " << name << " and " 
+              << otherUser->getName() << std::endl;
+}
+
+Post* User::new_post(const std::string& content) {
+    Post* newPost = new Post(this, content);
+    
+    // If this is the first post
+    if (postsHead == nullptr) {
+        postsHead = postsTail = newPost;
+    } else {
+        // Add to end of list
+        postsTail->next = newPost;
+        postsTail = newPost;
+    }
+    
+    postCount++;
+    return newPost;
+}
+
+void User::display_feed() {
+    std::cout << "=== " << name << "'s Feed ===\n";
+    
+    // First, collect all posts (user's posts and friends' posts)
+    std::vector<Post*> allPosts;
+    
+    // Add user's own posts
+    Post* current = postsHead;
+    while (current != nullptr) {
+        allPosts.push_back(current);
+        current = current->next;
+    }
+    
+    // Add friends' posts
+    for (int i = 0; i < Fcount; i++) {
+        current = friends[i]->postsHead;
+        while (current != nullptr) {
+            allPosts.push_back(current);
+            current = current->next;
+        }
+    }
+    
+    // Sort posts by recency (most recent first)
+    std::sort(allPosts.begin(), allPosts.end(), 
+        [](Post* a, Post* b) { return a->getRecencyNum() > b->getRecencyNum(); });
+    
+    // Display most recent MAX_FEED posts
+    int count = 0;
+    for (Post* post : allPosts) {
+        if (count++ >= MAX_FEED) break;
+        post->displayPost();
+    }
 }
